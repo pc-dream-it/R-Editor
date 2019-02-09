@@ -17,6 +17,6 @@ R Statistical snippets editor and launcher, most of snippets are used for Six Si
 # Set Up R-Editor
 
 - Install AutoHotKey : https://autohotkey.com/
-- save and launch R_Editor.ahk
+- save and launch <a href="https://github.com/pc-dream-it/R-Editor/raw/master/R_Editor.ahk">R_Editor.ahk</a>
 
 
