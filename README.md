@@ -1,4 +1,4 @@
-# R-Editor
+# R-Editor for Six Sigma
 R Statistical snippets editor and launcher, most of snippets are used for Six Sigma projects
 </br>
 
