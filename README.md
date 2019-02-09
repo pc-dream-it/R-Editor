@@ -2,7 +2,7 @@
 R Statistical snippets editor and launcher, most of snippets are used for Six Sigma projects
 </br>
 
-<img src="https://media.giphy.com/media/3D45kfN9muM5YUENMw/giphy.gif"  align="center">
+<img src="https://media.giphy.com/media/31UKg4eomVj2jmXlBV/giphy.gif"  align="center">
 
 
 # Before installation
