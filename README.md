@@ -16,8 +16,9 @@ R Statistical snippets editor and launcher, most of snippets are used for Six Si
 
 # Install Six Sigma Packages
 
-install.packages("qcc") 
-install.packages("SixSigma") 
+install.packages("qcc") </br>
+install.packages("SixSigma") </br>
+#Install all other dependencies
 
 # Set Up R-Editor
 
