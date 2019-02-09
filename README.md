@@ -14,6 +14,11 @@ R Statistical snippets editor and launcher, most of snippets are used for Six Si
 -Click “New”, and add the folder address (paste it) for R to there </br>
 -Restart Computer
 
+# Install Six Sigma Packages
+
+install.packages(qcc) 
+install.packages(SixSigma) 
+
 # Set Up R-Editor
 
 - Install AutoHotKey : https://autohotkey.com/
