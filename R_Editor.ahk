@@ -20,16 +20,21 @@ Menu, FileMenu, Add  ; Separator line.
 Menu, FileMenu, Add, &Exit, FileExit
 Menu, HelpMenu, Add, &About R-Editor, HelpAbout
 Menu, HelpMenu, Add, &Version, Version
+;Menu, Tools, Add, &Install Pachages, InstallPackages
 ;Menu, HelpMenu, Add, &About R_Editor, R_editor
 ;Menu, Execute, Add, &Execute, Execute_R
 ;Menu, Schedule, Add, &Schedule Daily, ScheduleDaily
 ;************************INSERT FUNCTIONS******************************************
+Menu,Graphs,Add,Scatter Plot,          SimpleScatter
+Menu,Graphs,Add,Matrix Scatter Plot,          MatixScatter
 Menu,Graphs,Add,Pareto Chart,          Pareto
 Menu,Graphs,Add,Run Chart,          RunChart
 Menu,Graphs,Add,Histogram Capability,          HistoCapa
+Menu,Graphs,Add,Box Plot,          BoxPlot
 Menu,Projects,Add,C&E Diagram,          Fishbone
 Menu,Statistics,Add,Gage R and R,          GageR
 Menu,Statistics,Add,Capability Analysis,          Capability
+Menu,Statistics,Add,One-Sample T,          OneSampleT
 
 Menu, MyMenuBar, Add, &File, :FileMenu
 Menu, MyMenuBar,Icon,&File, %A_WinDir%\system32\SHELL32.dll, 7
@@ -53,7 +58,7 @@ Menu, MyMenuBar, Add
 
 Menu, MyMenuBar, Add, &Help, :HelpMenu
 Menu, MyMenuBar,Icon,&Help, %A_WinDir%\system32\SHELL32.dll, 155 
-
+;Menu, MyMenuBar, Add, &Tools, :Tools
 ;Menu, MyMenuBar, Add, &Open Log, Log
 ;Menu, MyMenuBar,Icon,&Open Log, %A_WinDir%\system32\SHELL32.dll, 166 
 ;Menu, MyMenuBar, Add, &Schedule, :Schedule
@@ -74,6 +79,105 @@ Return
 
 CurrentFileName =  ; Indicate that there is no current file.
 
+BoxPlot:
+Store:=ClipboardAll  ;****Store clipboard ****
+Clipboard=
+(  Join`r`n
+library(qcc)
+data(pistonrings)
+diameter = with(pistonrings, qcc.groups(diameter, sample))
+mean(diameter[1,])
+#BoxPlot:
+library(ggpubr)
+ggboxplot(diameter[1,], 
+          ylab = "Diameter", xlab = FALSE,
+          ggtheme = theme_minimal())
+)
+Gosub Paste_and_Restore_Stored_Clipboard
+return
+
+OneSampleT:
+Store:=ClipboardAll  ;****Store clipboard ****
+Clipboard=
+(  Join`r`n
+#http://www.instantr.com/2012/12/29/performing-a-one-sample-t-test-in-r/
+library(qcc)
+data(pistonrings)
+diameter = with(pistonrings, qcc.groups(diameter, sample))
+mean(diameter[1,])
+
+#Null hypothesis: the mean is equal to 74.5
+t.test(diameter[1,], mu=74.5, alternative="less", conf.level=0.99)
+
+#RESULTS:
+#p-value <0,01  
+#Then we can reject null hypothesis
+#It means:
+#There is evidence that the observed mean is under 74.5
+#BoxPlot:
+library(ggpubr)
+ggboxplot(diameter[1,], 
+          ylab = "Diameter", xlab = FALSE,
+          ggtheme = theme_minimal())
+)
+Gosub Paste_and_Restore_Stored_Clipboard
+return
+
+MatixScatter:
+Store:=ClipboardAll  ;****Store clipboard ****
+Clipboard=
+(  Join`r`n
+# Basic Scatterplot Matrix
+pairs(~mpg+disp+drat+wt,data=mtcars, 
+   main="Simple Scatterplot Matrix")
+)
+Gosub Paste_and_Restore_Stored_Clipboard
+return
+   
+SimpleScatter:
+Store:=ClipboardAll  ;****Store clipboard ****
+Clipboard=
+(  Join`r`n
+#https://www.statmethods.net/graphs/scatterplot.html
+# Simple Scatterplot
+attach(mtcars)
+plot(wt, mpg, main="Scatterplot Example", 
+   xlab="Car Weight ", ylab="Miles Per Gallon ", pch=19)
+# Add fit lines
+abline(lm(mpg~wt), col="red") # regression line (y~x) 
+lines(lowess(wt,mpg), col="blue") # lowess line (x,y)
+)
+Gosub Paste_and_Restore_Stored_Clipboard
+return
+
+InstallPackages:
+
+    Gui 2:Add, Text, x19 y9 w139 h23 +0x200, Enter Package Name:
+    Gui 2:Add, Edit, vpackagename x16 y71 w399 h21, Name
+    Gui 2:Add, Button, x15 y233 w180 h23 gAddPackage, INSTALL from CRAN
+    
+    Gui 2:Show, w426 h270, Package install
+
+return
+
+
+2AddPackage:  
+2GuiClose:
+2GuiEscape:
+Gui, 1:-Disabled  ; Re-enable the main window (must be done prior to the next step).
+Gui, 2: Destroy  ; Destroy the  box.
+return
+
+AddPackage:
+    GuiControlGet , spackagename,, packagename
+Store:=ClipboardAll  ;****Store clipboard ****
+Clipboard=
+(  Join`r`n
+#usefull packages are qcc, SixSigma, ...
+install.packages(staskname, repos = "http://cran.us.r-project.org")
+)
+Gosub Paste_and_Restore_Stored_Clipboard
+return
 
 
 HistoCapa:
@@ -412,62 +516,12 @@ FoundPosIntro := InStr(OutputVar, "to quit R" , false,  0,1)
     
 GuiControl,, Res, %sCurrentText% %OutputVar% 
     Sleep, 200
-ControlSend, Edit2, ^{End}, R_Editor for Six Sigma
+;ControlSend, Edit2, ^{End}, R_Editor for Six Sigma
 
     WinWait, ahk_exe cmd.exe
     WinMove, ahk_exe cmd.exe ,,(A_ScreenWidth)-(600) ,(A_ScreenHeight)-(400) , 600, 400
 return
 
-
-;Log:
-    ;run, %CurrentFileName%.log
-;    FoundPos := InStr(CurrentFileName, "\" , false,  0,1)
-;    Rpath := SubStr(CurrentFileName, 1, FoundPos)"scritptest.Rout"   
-;MsgBox, %Rpath%
-          
-;        Run, notepad  "%Rpath%" 
-
-;return
-
-/*
-ScheduleDaily:
-
-    GuiControlGet , mFile,, Filenametext
-
-    If InStr(mFile, " ")
-    {
-        MsgBox, Path:%mFile% `n Phantomjs does not work with file paths that have spaces in them. Please Save it in other Path without spaces
-    }
-    else
-    {
-
-    Gui 2:Add, Text, x19 y9 w139 h23 +0x200, Add Daily Task:
-    Gui 2:Add, Text, x16 y43 w120 h23 +0x200, Task Name:
-    Gui 2:Add, Edit, vthistaskname x16 y71 w399 h21, My task
-    Gui 2:Add, Text, x16 y99 w120 h23 +0x200, Batch File (.bat) Path:
-    Gui 2:Add, Edit, vfile x16 y129 w335 h21 
-    Gui 2:Add, Button, x354 y129 w70 h21 gBROWSE, BROWSE
-    Gui 2:Add, DateTime, vtime x15 y156 w120 h23   1, HH:mm
-    Gui 2:Add, Button, x15 y233 w80 h23 gAddTaskDaily, ADD TASK
-    Gui 2:Add, Button, x117 y232 w85 h23 gcheckTasks, CHECK TASKS
-    Gui 2:Add, Button, x261 y232 w153 h23 gOpenScheduler, OPEN TASK SCHEDULER
-    ;MsgBox, %mFile%
-    GuiControl,2:, file, %mFile%.bat  
-    
-    Gui 2:Show, w426 h270, Tasks Scheduler Windows
-    }
-
-Return
-
-2AddTaskDaily:  
-2OpenScheduler:  
-2GuiClose:
-2GuiEscape:
-Gui, 1:-Disabled  ; Re-enable the main window (must be done prior to the next step).
-Gui, 2: Destroy  ; Destroy the about box.
-return
-
-*/
 
 BROWSE()
 {
@@ -604,7 +658,7 @@ sleep, 100
 
 ;MsgBox, %Rpath%
         DelTask=R.exe CMD BATCH --vanilla --interactive "%tempfilepath%" "%Rpath%" 
-        
+       ; DelTask=R.exe CMD BATCH "%tempfilepath%" "%Rpath%" 
 
         Run,  %DelTask%,, Min
  
@@ -636,7 +690,7 @@ FoundPosIntro := InStr(OutputVar, "to quit R" , false,  0,1)
  WinActivate, ahk_class AutoHotkeyGUI
 
 
-GuiControl,, Res, %sCurrentText% %OutputVar% ^{End}
+GuiControl,, Res, %sCurrentText% %OutputVar% ;^{End}
     Sleep, 200
  
 ; ControlSend, Edit2, ^{End}
